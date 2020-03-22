@@ -124,3 +124,37 @@ add_filter( 'map_meta_cap', function ( $caps, $cap, $user_id, $args ) {
 
 }, 10, 4 );
 
+function shareaccess_only_user_posts($query) {
+    global $pagenow;
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'share_access';
+ 
+    if( 'edit.php' != $pagenow || !$query->is_admin )
+        return $query;
+    if(!$query->is_main_query())
+        return $query;
+ 
+    global $user_ID;
+    $shared_rows = $wpdb->get_results( "SELECT post_id FROM $table_name WHERE user_id=$user_ID" );
+    $shared_ids = array();
+    foreach($shared_rows as $row){
+	$shared_ids[] = $row->post_id;
+    }
+    if(count($shared_ids) > 0){
+	$args = array(
+		'author'        =>  $user_ID, 
+		'orderby'       =>  'post_date',
+		'order'         =>  'ASC',
+		'posts_per_page' => -1 
+	);
+	$authors_query = new WP_Query($args);
+	$author_ids = wp_list_pluck($authors_query->posts, 'ID');
+	$shared_ids = array_merge($shared_ids, $author_ids);
+    	$query->set('post__in', $shared_ids );
+    }else{
+    	$query->set('author', $user_ID );
+    }
+    return $query;
+}
+add_filter('pre_get_posts', 'shareaccess_only_user_posts');
