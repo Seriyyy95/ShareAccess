@@ -130,7 +130,7 @@ function shareaccess_only_user_posts($query) {
 
     $table_name = $wpdb->prefix . 'share_access';
  
-    if( 'edit.php' != $pagenow || !$query->is_admin )
+    if( 'edit.php' != $pagenow || $query->is_admin )
         return $query;
     if(!$query->is_main_query())
         return $query;
