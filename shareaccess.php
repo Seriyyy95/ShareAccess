@@ -129,11 +129,13 @@ function shareaccess_only_user_posts($query) {
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'share_access';
- 
-    if( 'edit.php' != $pagenow || $query->is_admin )
+    if( 'edit.php' != $pagenow || !$query->is_admin )
         return $query;
     if(!$query->is_main_query())
         return $query;
+    if(current_user_can('administrator')){
+	return $query;
+    }
  
     global $user_ID;
     $shared_rows = $wpdb->get_results( "SELECT post_id FROM $table_name WHERE user_id=$user_ID" );
