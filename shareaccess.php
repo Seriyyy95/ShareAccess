@@ -25,8 +25,12 @@ register_activation_hook( __FILE__, function(){
 add_action('add_meta_boxes', 'shareaccess_add_custom_box');
 function shareaccess_add_custom_box(){
 	$screens = array( 'post', 'page' );
+	$params = array(
+        	'__block_editor_compatible_meta_box' => true,
+		'__back_compat_meta_box' => false,
+    	);
 	if(current_user_can('administrator')){
-		add_meta_box( 'shareaccess_select_author', 'Разрешить доступ к записи пользователю', 'shareaccess_meta_box_callback', $screens );
+		add_meta_box( 'shareaccess_select_author', 'Разрешить доступ к записи пользователю', 'shareaccess_meta_box_callback', $screens, 'normal', 'high', $params );
 	}
 }
 
