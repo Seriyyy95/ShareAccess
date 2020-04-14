@@ -136,7 +136,10 @@ function shareaccess_only_user_posts($query) {
     if(current_user_can('administrator')){
 	return $query;
     }
- 
+    if(current_user_can('editor')){
+	return $query;
+    }
+
     global $user_ID;
     $shared_rows = $wpdb->get_results( "SELECT post_id FROM $table_name WHERE user_id=$user_ID" );
     $shared_ids = array();
