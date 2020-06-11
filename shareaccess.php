@@ -22,6 +22,31 @@ register_activation_hook( __FILE__, function(){
         dbDelta( $sql );
 });
 
+function shareaccess_register_options_page() {
+  add_options_page('Page Title', 'Share Access', 'manage_options', 'ShareAccess', 'shareaccess_options_page');
+}
+add_action('admin_menu', 'shareaccess_register_options_page');
+
+function shareaccess_options_page()
+{
+        global $wpdb;
+	$table_name = $wpdb->prefix . 'share_access';
+        $shared_posts = $wpdb->get_results("SELECT id, post_id, user_id FROM $table_name ORDER BY user_id", ARRAY_A);
+        require_once ('settings-page.php');
+}
+
+add_action( 'admin_post_shareaccess_unshare', 'shareaccess_unshare' );
+
+function shareaccess_unshare() {
+        $share_id = intval($_REQUEST["id"]);
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'share_access';
+	$wpdb->query("DELETE FROM $table_name WHERE id='$share_id'");
+ 
+        $location = $_SERVER['HTTP_REFERER'];
+        wp_safe_redirect($location);
+}
+
 add_action('add_meta_boxes', 'shareaccess_add_custom_box');
 function shareaccess_add_custom_box(){
 	$screens = array( 'post', 'page' );
